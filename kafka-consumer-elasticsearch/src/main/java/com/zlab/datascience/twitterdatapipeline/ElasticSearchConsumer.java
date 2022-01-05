@@ -30,9 +30,9 @@ public class ElasticSearchConsumer {
 
     public static RestHighLevelClient createClient(){
 
-        String hostname = "kafka-cluter-test-4508726478.us-east-1.bonsaisearch.net";
-        String username = "cti9q7no43";
-        String password = "1fnjm45qp0";
+        String hostname = "";
+        String username = "";
+        String password = "";
 
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
@@ -86,11 +86,17 @@ public class ElasticSearchConsumer {
             for(ConsumerRecord record : records){
 
                 IndexRequest indexRequest = new IndexRequest(
-                        "twitter", "tweets").source(record.value(), XContentType.JSON);
+                        "twitter", "tweets").source((String)record.value(), XContentType.JSON);
 
                 IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
                 String id = indexResponse.getId();
                 logger.info(id);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 logger.info("Key: "+record.key() +" -> "+"Value: "+record.value());
                 logger.info("Partition: "+record.partition()+" | "+" Offset: "+record.offset());

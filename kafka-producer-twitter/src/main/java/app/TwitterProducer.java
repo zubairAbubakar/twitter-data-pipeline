@@ -27,8 +27,12 @@ public class TwitterProducer {
 
     String consumerKey = "";
     String consumerSecret = "";
-    String token = "";
-    String secret = "";
+    String accessToken = "";
+    String accessTokenSecret = "";
+
+
+    // tweet keywords of interest
+    List<String> terms = Lists.newArrayList("kafka");
 
     TwitterProducer(){}
 
@@ -91,12 +95,10 @@ public class TwitterProducer {
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
         StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
 
-        // Optional: set up some followings and track terms
-        List<String> terms = Lists.newArrayList("kafka", "api", "usa", "politics");
         hosebirdEndpoint.trackTerms(terms);
 
         // These secrets should be read from a config file
-        Authentication hosebirdAuth = new OAuth1("consumerKey", "consumerSecret", "token", "secret");
+        Authentication hosebirdAuth = new OAuth1(consumerKey, consumerSecret, accessToken, accessTokenSecret);
 
         ClientBuilder builder = new ClientBuilder()
                 .name("Hosebird-Client-01")                              // optional: mainly for the logs
@@ -127,7 +129,7 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
 
         // add high throughput producer properties
-        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "gzip");
         properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
         properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32+1024)); //32kB batch size
 
