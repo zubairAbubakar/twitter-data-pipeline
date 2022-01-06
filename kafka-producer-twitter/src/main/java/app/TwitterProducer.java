@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -25,14 +26,20 @@ public class TwitterProducer {
 
     Logger logger = LoggerFactory.getLogger(TwitterProducer.class);
 
-    String consumerKey = "";
-    String consumerSecret = "";
-    String accessToken = "";
-    String accessTokenSecret = "";
+    ResourceBundle twitterApiProperties = ResourceBundle.getBundle("TwitterApi");
+
+    public ResourceBundle getTwitterApiProperties() {
+        return twitterApiProperties;
+    }
+
+    String apiKey = getTwitterApiProperties().getString("apiKey");
+    String apiSecret = getTwitterApiProperties().getString("apiSecret");
+    String accessToken = getTwitterApiProperties().getString("accessToken");
+    String accessTokenSecret = getTwitterApiProperties().getString("accessTokenSecret");
 
 
     // tweet keywords of interest
-    List<String> terms = Lists.newArrayList("kafka");
+    List<String> terms = Lists.newArrayList("kafka", "politics", "canada");
 
     TwitterProducer(){}
 
@@ -98,7 +105,7 @@ public class TwitterProducer {
         hosebirdEndpoint.trackTerms(terms);
 
         // These secrets should be read from a config file
-        Authentication hosebirdAuth = new OAuth1(consumerKey, consumerSecret, accessToken, accessTokenSecret);
+        Authentication hosebirdAuth = new OAuth1(apiKey, apiSecret, accessToken, accessTokenSecret);
 
         ClientBuilder builder = new ClientBuilder()
                 .name("Hosebird-Client-01")                              // optional: mainly for the logs

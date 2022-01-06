@@ -3,3 +3,6 @@
 */target
 
 /kafka-consumer-elasticsearch/target
+
+/kafka-producer-twitter/src/main/resources/TwitterApi.properties
+/kafka-consumer-elasticsearch/src/main/resources/ElasticSearch.properties

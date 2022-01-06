@@ -1,5 +1,6 @@
 package com.zlab.datascience.twitterdatapipeline;
 
+import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -30,9 +31,9 @@ public class ElasticSearchConsumer {
 
     public static RestHighLevelClient createClient(){
 
-        String hostname = "";
-        String username = "";
-        String password = "";
+        String hostname = "kafka-cluter-test-4508726478.us-east-1.bonsaisearch.net";
+        String username = "cti9q7no43";
+        String password = "1fnjm45qp0";
 
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
@@ -73,6 +74,14 @@ public class ElasticSearchConsumer {
         return consumer;
     }
 
+    //private static JsonParser jsonParser = new JsonParser();
+
+    private static String extractIdFromTweet(String tweet){
+        //gson library
+        return JsonParser.parseString(tweet).getAsJsonObject().get("id_str").getAsString();
+
+    }
+
     public static void main(String[] args) throws IOException {
 
         Logger logger = LoggerFactory.getLogger(ElasticSearchConsumer.class);
@@ -85,12 +94,16 @@ public class ElasticSearchConsumer {
 
             for(ConsumerRecord record : records){
 
+                // get tweet id
+                String id = extractIdFromTweet(record.value().toString());
+
                 IndexRequest indexRequest = new IndexRequest(
-                        "twitter", "tweets").source((String)record.value(), XContentType.JSON);
+                        "twitter",
+                         "tweets",
+                                id).source((String)record.value(), XContentType.JSON);
 
                 IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-                String id = indexResponse.getId();
-                logger.info(id);
+                logger.info(indexResponse.getId());
 
                 try {
                     Thread.sleep(1000);
